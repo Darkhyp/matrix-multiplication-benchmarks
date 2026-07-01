@@ -1,0 +1,10 @@
+#pragma once
+
+void launch_matmul_kernel(
+    const float* dA,
+    const float* dB,
+    float* dC,
+    int rows_A,
+    int cols_A,
+    int cols_B
+    );
