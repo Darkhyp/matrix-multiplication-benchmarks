@@ -1,9 +1,37 @@
-KOKKOS_SRC
-KIWAKU_SRC
-RABERU_SRC
-KUMI_SRC
-EVE_SRC
-pycuda
-build
-*.pyd
+# External dependencies
+KOKKOS_SRC/
+KIWAKU_SRC/
+RABERU_SRC/
+KUMI_SRC/
+EVE_SRC/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build artifacts
+build/
+dist/
 *.so
+*.pyd
+*.dll
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# CUDA/NVHPC temporary files
+*.o
+*.obj
+*.ptx
+*.cubin
+*.fatbin
+*.mod
+*.d
+
+# Test and benchmark outputs
+*.log
+*.out
