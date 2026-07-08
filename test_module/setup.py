@@ -213,11 +213,11 @@ ext_modules = [
         extra_link_args=[
             "cuda.lib"
         ],
-        # extra_objects=[
-        #     compiled_fortran_objects_CPU,
-        #     compiled_fortran_objects_GPU,
-        #     os.path.join(MSYS_LIB_DIR, "libopenblas.dll.a")
-        # ],
+        extra_objects=[
+            compiled_fortran_objects_CPU,
+            compiled_fortran_objects_GPU,
+            os.path.join(MSYS_LIB_DIR, "libopenblas.dll.a")
+        ],
     ),
 ]
 

@@ -3,5 +3,7 @@ KIWAKU_SRC
 RABERU_SRC
 KUMI_SRC
 EVE_SRC
+pycuda
 build
 *.pyd
+*.so

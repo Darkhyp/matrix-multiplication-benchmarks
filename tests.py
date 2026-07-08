@@ -1,12 +1,19 @@
+import platform
 import numpy as np
 import cupy as cp
-import test_module as TEST
 import time
 from numba import njit, prange
 
 from test_module.numba_test import numba_matrix_dot
 from test_module.pyCUDA_test import pyCUDA_matrix_dot
 from test_module.tools import print_system_info
+
+if platform.system() == "Linux":
+    print("Running on Linux")
+    import hpc_benchmark_core as TEST
+else:
+    print("Running on Windows")
+    import test_module as TEST
 
 # -------------------------------------------------------------------------
 # Warmup Calls (Important: Numba/EVE/GPU compiles on the very first execution)
@@ -24,6 +31,9 @@ if __name__ == '__main__':
     # Create two random matrices
     A = np.random.rand(N, M).astype(np.float32)
     B = np.random.rand(M, P).astype(np.float32)
+
+    af = np.asfortranarray(A, dtype=np.float64)
+    bf = np.asfortranarray(B, dtype=np.float64)
 
     print("Running numpy Matrix Multiplication...")
     # Cross-check accuracy with NumPy
@@ -98,6 +108,21 @@ if __name__ == '__main__':
     KIWAKU_execution_time, result_flat = TEST.kiwaku_dot(A, B)
     results.append({"time": KIWAKU_execution_time, "result": result, "comment": "KIWAKU C++ Engine"})
 
+    print("Running Fortran CPU Matrix Multiplication...")
+    if platform.system() == "Linux":
+        # Call the fortran
+        if WARMUP:
+            _, _ = TEST.matmul_cpu(af, bf)
+        FORTRAN_execution_time, result = TEST.matmul_cpu(af, bf)
+        results.append({"time": FORTRAN_execution_time, "result": result, "comment": "Fortran CPU Engine"})
+
+    print("Running Fortran GPU Matrix Multiplication...")
+    if platform.system() == "Linux":
+        # Call the fortran
+        if WARMUP:
+            _, _ = TEST.matmul_gpu(af, bf)
+        FORTRAN_execution_time, result = TEST.matmul_gpu(af, bf)
+        results.append({"time": FORTRAN_execution_time, "result": result, "comment": "Fortran GPU Engine"})
 
     # *******************************
     #     PERFORMANCE COMPARISON

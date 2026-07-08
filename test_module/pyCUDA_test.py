@@ -1,3 +1,4 @@
+import platform
 import time
 
 import numpy as np
@@ -5,7 +6,17 @@ import pycuda.driver as cuda
 import pycuda.autoinit  # Automatically initializes the CUDA context
 from pycuda.compiler import SourceModule
 
-from test_module.pathes import MSVC_BIN_DIR
+if platform.system() == "Linux":
+    print("Running on Linux")
+    nvcc_options = [
+        "-ccbin", "/usr/bin/g++",
+    ]
+else:
+    from test_module.pathes import MSVC_BIN_DIR
+    nvcc_options = [
+        "-ccbin", MSVC_BIN_DIR,
+        "-allow-unsupported-compiler",
+    ]
 
 # the raw C++ CUDA kernel
 mod = SourceModule("""
@@ -24,10 +35,7 @@ mod = SourceModule("""
         }
     }
     """,
-    options=[
-        "-ccbin", MSVC_BIN_DIR,
-        "-allow-unsupported-compiler"
-    ]
+    options=nvcc_options
 )
 
 def pyCUDA_matrix_dot(A, B, WARMUP=False):

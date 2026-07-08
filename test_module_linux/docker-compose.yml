@@ -1,0 +1,22 @@
+services:
+  hpc_stack:
+    build: .
+    container_name: hpc_test_runner
+    # This mounts your local Windows folder directly inside the Linux container
+    volumes:
+      - ..:/workspace   # to mount the parent directory
+      - kokkos_build_cache:/workspace/test_module/KOKKOS_SRC/dist_linux/build
+    # This grants the container full permission to hook into your Windows GPU
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Keeps the container open so you can interact with it
+    tty: true
+    stdin_open: true
+
+volumes:
+  kokkos_build_cache:

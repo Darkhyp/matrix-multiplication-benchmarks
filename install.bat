@@ -22,7 +22,13 @@ rmdir /s /q build
 mkdir build
 cd build
 
-cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_CUDA=ON -DKokkos_ENABLE_CUDA_LAMBDA=ON -DKokkos_ENABLE_COMPILE_AS_CMAKE_LANGUAGE=ON -DKokkos_ARCH_ADA89=ON -DCMAKE_INSTALL_PREFIX="F:/usr/PycharmProjects/VEC_tests/test_module/KOKKOS_SRC/dist"
+cmake .. -DCMAKE_CXX_STANDARD=20 \
+         -DCMAKE_BUILD_TYPE=Release \
+         -DKokkos_ENABLE_CUDA=ON \
+         -DKokkos_ENABLE_CUDA_LAMBDA=ON \
+         -DKokkos_ENABLE_COMPILE_AS_CMAKE_LANGUAGE=ON \
+         -DKokkos_ARCH_ADA89=ON \
+         -DCMAKE_INSTALL_PREFIX="F:/usr/PycharmProjects/VEC_tests/test_module/KOKKOS_SRC/dist"
 cmake --build . --config Release --target install
 
 :: ***********************

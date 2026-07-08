@@ -15,10 +15,18 @@ subroutine matmul_gpu(A, B, C, N, M, P, elapsed_ms)
 
     ! nvfortran automatically converts this block into a CUDA Kernel Grid
     ! shared memory management and thread configurations are handled by the compiler
-    do concurrent (j = 1:P, i = 1:N) local(k)
-        C(i, j) = 0.0_c_float
-        do k = 1, M
-            C(i, j) = C(i, j) + A(i, k) * B(k, j)
+!    do concurrent (j = 1:P, i = 1:N) local(k)
+!        C(i, j) = 0.0_c_float
+!        do k = 1, M
+!            C(i, j) = C(i, j) + A(i, k) * B(k, j)
+!        end do
+!    end do
+    do j = 1, P
+        do i = 1, N
+            C(i, j) = 0.0_c_float
+            do k = 1, M
+                C(i, j) = C(i, j) + A(i, k) * B(k, j)
+            end do
         end do
     end do
 

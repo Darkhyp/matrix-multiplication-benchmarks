@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/pycuda" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/test_module/EVE_SRC" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/test_module/KIWAKU_SRC" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/test_module/KOKKOS_SRC" vcs="Git" />
