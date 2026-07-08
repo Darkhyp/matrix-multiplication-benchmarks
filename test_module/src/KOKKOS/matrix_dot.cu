@@ -1,4 +1,9 @@
-#include <Kokkos_Core.hpp>
+// Copyright (c) 2026
+// Author: Alexandre Korovin
+// e-mail: a.v.korovin73@gmail.com
+// SPDX-License-Identifier: MIT
+
+ #include <Kokkos_Core.hpp>
 #include <chrono>
 #include <vector>
 #include <pybind11/pybind11.h>

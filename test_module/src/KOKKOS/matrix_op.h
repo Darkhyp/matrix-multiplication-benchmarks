@@ -1,4 +1,9 @@
-#pragma once
+// Copyright (c) 2026
+// Author: Alexandre Korovin
+// e-mail: a.v.korovin73@gmail.com
+// SPDX-License-Identifier: MIT
+
+ #pragma once
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;

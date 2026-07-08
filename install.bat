@@ -1,3 +1,8 @@
+:: Copyright (c) 2026
+:: Author: Alexandre Korovin
+:: e-mail: a.v.korovin73@gmail.com
+:: SPDX-License-Identifier: MIT
+
 pip install pybind11 numpy numba cupy-cuda12x pycuda psutil
 
 :: ***********************

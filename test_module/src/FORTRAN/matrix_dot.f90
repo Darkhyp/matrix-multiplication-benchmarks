@@ -1,3 +1,8 @@
+ ! Copyright (c) 2026
+ ! Author: Alexandre Korovin
+ ! e-mail: a.v.korovin73@gmail.com
+ ! SPDX-License-Identifier: MIT
+
 subroutine matmul_cpu(A, B, C, N, M, P, elapsed_ms)
     use, intrinsic :: iso_c_binding
     implicit none

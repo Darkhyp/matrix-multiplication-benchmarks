@@ -1,4 +1,9 @@
-__global__
+// Copyright (c) 2026
+// Author: Alexandre Korovin
+// e-mail: a.v.korovin73@gmail.com
+// SPDX-License-Identifier: MIT
+
+ __global__
 void matmulKernel(
     const float* A,
     const float* B,

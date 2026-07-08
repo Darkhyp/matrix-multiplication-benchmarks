@@ -1,4 +1,9 @@
-cd test_module
+:: Copyright (c) 2026
+:: Author: Alexandre Korovin
+:: e-mail: a.v.korovin73@gmail.com
+:: SPDX-License-Identifier: MIT
+
+d test_module
 
 taskkill /F /IM python.exe
 rmdir /s /q build

@@ -1,3 +1,8 @@
+# Copyright (c) 2026
+# Author: Alexandre Korovin
+# e-mail: a.v.korovin73@gmail.com
+# SPDX-License-Identifier: MIT
+
 import os
 import subprocess
 import sys

@@ -1,4 +1,9 @@
-#include <vector>
+// Copyright (c) 2026
+// Author: Alexandre Korovin
+// e-mail: a.v.korovin73@gmail.com
+// SPDX-License-Identifier: MIT
+
+ #include <vector>
 #include <chrono>
 #include <cuda_runtime.h>
 #include "matrix_dot.hu"

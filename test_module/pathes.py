@@ -1,3 +1,8 @@
+# Copyright (c) 2026
+# Author: Alexandre Korovin
+# e-mail: a.v.korovin73@gmail.com
+# SPDX-License-Identifier: MIT
+
 import os
 
 MSVC_BIN_DIR = r"C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Tools\MSVC\14.50.35717\bin\HostX86\x64"

@@ -95,16 +95,16 @@ The benchmarks below were captured natively under the following hardware environ
 
 | Engine / Backend | Execution Time (ms) | Speedup vs. NumPy | Status Verification |
 | :--- | :---: | :---: | :--- |
-| **Kokkos C++ Engine** | 0.1241 ms | **40.81x** | ✅ Passed (Max Dev: 1.83e-04) |
-| **pyCUDA (GPU) Loop** | 0.1529 ms | **33.12x** | ✅ Passed (Max Dev: 1.83e-04) |
-| **CUDA (GPU) Loop** | 0.2284 ms | **22.17x** | ✅ Passed (Max Dev: 1.83e-04) |
-| **CuPy (GPU) Loop** | 0.7760 ms | **6.53x** | ✅ Passed (Max Dev: 1.07e-04) |
 | **NumPy (np.dot) — Baseline** | 5.0644 ms | *1.00x* | *Reference Standard* |
-| **Numba JIT Loop** | 11.5364 ms | 0.44x | ✅ Passed (Max Dev: 1.83e-04) |
-| **EVE C++ Engine2** | 13.6215 ms | 0.37x | ✅ Passed (Max Dev: 1.98e-04) |
-| **KIWAKU C++ Engine** | 161.6609 ms | 0.03x | ✅ Passed (Max Dev: 1.83e-04) |
-| **Fortran CPU Engine** | 198.1114 ms | 0.01x | ✅ Passed (Max Dev: 1.07e-04) |
-| **Fortran GPU Engine** | 15.8871 ms | 0.07x | ✅ Passed (Max Dev: 2.29e-04) |
+| **CuPy (GPU) Loop** | 0.0901 ±  0.0273 ms | **151.6x** | ✅ Passed (Max Dev: 1.07e-04) |
+| **Kokkos C++ Engine** | 0.1360 ±  0.010 ms | **100.42x** | ✅ Passed (Max Dev: 1.83e-04) |
+| **pyCUDA (GPU) Loop** | 0.1705 ±  0.0459 ms | **80.12x** | ✅ Passed (Max Dev: 1.83e-04) |
+| **CUDA (GPU) Loop** | 0.2532 ±  0.0362 ms | **53.95x** | ✅ Passed (Max Dev: 1.83e-04) |
+| **Numba JIT Loop** | 11.1702 ±  0.3146 ms | 1.22x | ✅ Passed (Max Dev: 1.83e-04) |
+| **Fortran GPU Engine** | 11.3860 ±  1.5864 ms | 1.20x | ✅ Passed (Max Dev: 2.29e-04) |
+| **EVE C++ Engine2** | 14.6450 ±  0.3200 ms | 0.93x | ✅ Passed (Max Dev: 1.98e-04) |
+| **KIWAKU C++ Engine** | 165.3427 ±  6.0889 ms | 0.08x | ✅ Passed (Max Dev: 1.83e-04) |
+| **Fortran CPU Engine** | 211.9286 ±  4.4525 ms | 0.06x | ✅ Passed (Max Dev: 1.07e-04) |
 
 Environment:
 

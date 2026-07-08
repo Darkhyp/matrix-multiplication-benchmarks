@@ -1,3 +1,8 @@
+# Copyright (c) 2026
+# Author: Alexandre Korovin
+# e-mail: a.v.korovin73@gmail.com
+# SPDX-License-Identifier: MIT
+
 import platform
 import time
 
@@ -5,13 +10,16 @@ import numpy as np
 import pycuda.driver as cuda
 import pycuda.autoinit  # Automatically initializes the CUDA context
 from pycuda.compiler import SourceModule
+from pathlib import Path
+
 
 if platform.system() == "Linux":
-    print("Running on Linux")
+    print(f"{Path(__file__).name}: Running on Linux")
     nvcc_options = [
         "-ccbin", "/usr/bin/g++",
     ]
 else:
+    print(f"{Path(__file__).name}: Running on Windows")
     from test_module.pathes import MSVC_BIN_DIR
     nvcc_options = [
         "-ccbin", MSVC_BIN_DIR,

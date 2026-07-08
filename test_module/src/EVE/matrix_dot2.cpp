@@ -1,4 +1,9 @@
-#include <eve/module/core.hpp>
+// Copyright (c) 2026
+// Author: Alexandre Korovin
+// e-mail: a.v.korovin73@gmail.com
+// SPDX-License-Identifier: MIT
+
+ #include <eve/module/core.hpp>
 #include <vector>
 #include <chrono>
 #include <iostream>

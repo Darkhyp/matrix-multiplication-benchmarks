@@ -1,24 +1,26 @@
+**/.idea/
+
 # External dependencies
-KOKKOS_SRC/
-KIWAKU_SRC/
-RABERU_SRC/
-KUMI_SRC/
-EVE_SRC/
+**/KOKKOS_SRC/
+**/KIWAKU_SRC/
+**/RABERU_SRC/
+**/KUMI_SRC/
+**/EVE_SRC/
 
 # Python cache
-__pycache__/
+**/__pycache__/
 *.py[cod]
-*.egg-info/
+**/*.egg-info/
 
 # Build artifacts
-build/
-dist/
+**/build/
+**/dist/
 *.so
 *.pyd
 *.dll
 
 # CMake
-CMakeFiles/
+**/CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
