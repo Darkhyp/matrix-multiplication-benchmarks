@@ -3,7 +3,7 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
- #include <pybind11/pybind11.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 #include <chrono>
@@ -19,18 +19,18 @@ std::pair<double, py::array_t<float>> kiwaku_dot(
     py::array_t<float> B
 )
 {
-    const int rows_A = A.shape(0);
-    const int cols_A = A.shape(1);
-    const int rows_B = B.shape(0);
-    const int cols_B = B.shape(1);
+    const auto rows_A = A.shape(0);
+    const auto cols_A = A.shape(1);
+    const auto rows_B = B.shape(0);
+    const auto cols_B = B.shape(1);
 
     if (A.ndim() != 2 || B.ndim() != 2)
         throw std::runtime_error("Expected 2D arrays");
     if (cols_A != rows_B)
         throw std::runtime_error("A and B are not compatible");
 
-    const int rows_C = rows_A;
-    const int cols_C = cols_B;
+    const auto rows_C = rows_A;
+    const auto cols_C = cols_B;
     py::array_t<float> C({rows_C, cols_C});
 
     // Get raw pointers directly from NumPy array buffers

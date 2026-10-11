@@ -177,15 +177,15 @@ class BuildCUDA(build_ext):
         super().build_extensions()
 
 
-compiled_fortran_objects_CPU = compile_fortran_sources(fortran_sources_CPU, use_gpu=False)
-compiled_fortran_objects_GPU = compile_fortran_sources(fortran_sources_GPU, use_gpu=True)
+extra_objects = []
+extra_objects += compile_fortran_sources(fortran_sources_CPU, use_gpu=False)
+# extra_objects += compile_fortran_sources(fortran_sources_GPU, use_gpu=True)
 
 ext_modules = [
     Pybind11Extension(
         "test_module",
         [
             "src/KIWAKU/matrix_dot.cpp",
-            # "src/KOKKOS/matrix_dot.cpp",
             "src/binding.cpp",
             "src/EVE/matrix_dot.cpp",
             "src/EVE/matrix_dot2.cpp",
@@ -197,32 +197,17 @@ ext_modules = [
             RABERU_INCLUDE,
             KUMI_INCLUDE,
             KOKKOS_INCLUDE,
-            "src"
+            "src",
         ],
-        library_dirs=[
-            KOKKOS_LIB_DIR,
-            CUDA_LIB_DIR,
-        ],
-        libraries=[
-            "kokkoscore",
-            "cudart",
-            "cuda"
-        ],
-        extra_compile_args=[
-            "/std:c++20",
-            "/O2",
-            "/EHsc",
-            '/bigobj',
-            "/arch:AVX2", # Adjust /arch if using AVX512 or NEON
-        ],
-        extra_link_args=[
-            "cuda.lib"
-        ],
-        extra_objects=[
-            compiled_fortran_objects_CPU,
-            compiled_fortran_objects_GPU,
-            os.path.join(MSYS_LIB_DIR, "libopenblas.dll.a")
-        ],
+        library_dirs=[KOKKOS_LIB_DIR, CUDA_LIB_DIR],
+        libraries=["kokkoscore", "cudart_static", "cuda"],
+        extra_compile_args=["/std:c++20", "/O2", "/EHsc", "/bigobj", "/arch:AVX2"],
+        # extra_link_args=["cuda.lib"],
+        # extra_objects=[
+        #     compiled_fortran_objects_CPU,
+        #     compiled_fortran_objects_GPU,
+        #     os.path.join(MSYS_LIB_DIR, "libopenblas.dll.a")
+        # ],
     ),
 ]
 

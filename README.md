@@ -81,31 +81,73 @@ The benchmarks below were captured natively under the following hardware environ
 
 | Engine / Backend | Execution Time (ms) | Speedup vs. NumPy | Status Verification |
 | :--- | :---: | :---: | :--- |
-| **Kokkos C++ Engine** | 0.1199 ms | **6.54x** | ✅ Passed (Max Dev: 1.83e-04) |
-| **pyCUDA (GPU) Loop** | 0.2701 ms | **2.90x** | ✅ Passed (Max Dev: 1.83e-04) |
-| **CUDA (GPU) Loop** | 0.2931 ms | **2.68x** | ✅ Passed (Max Dev: 1.83e-04) |
-| **CuPy (GPU) Loop** | 0.7149 ms | **1.10x** | ✅ Passed (Max Dev: 1.07e-04) |
-| **NumPy (np.dot) — Baseline** | 0.7843 ms | *1.00x* | *Reference Standard* |
-| **Numba JIT Loop** | 11.7512 ms | 0.07x | ✅ Passed (Max Dev: 1.83e-04) |
-| **EVE C++ Engine2** | 15.6520 ms | 0.05x | ✅ Passed (Max Dev: 1.98e-04) |
-| **KIWAKU C++ Engine** | 123.5508 ms | 0.01x | ✅ Passed (Max Dev: 1.83e-04) |
+| **CuPy (GPU) Loop** | 0.0751 ±  0.0111 ms | **9.53x** | ✅ Passed (Max Dev: 1.07e-04) |
+| **pyCUDA (GPU) Loop** | 0.1114 ±  0.0050 ms | **6.42x** | ✅ Passed (Max Dev: 1.83e-04) |
+| **Kokkos C++ Engine** | 0.1124 ±  0.0035 ms | **6.36x** | ✅ Passed (Max Dev: 1.83e-04) |
+| **CUDA (GPU) Loop** | 0.2252 ±  0.0204 ms | **3.18x** | ✅ Passed (Max Dev: 1.83e-04) |
+| **NumPy (np.dot) — Baseline** | 0.7154 ±  0.0461 ms | *1.00x* | *Reference Standard* |
+| **Numba JIT Loop** | 11.3972 ±  0.4946 ms | 0.06x | ✅ Passed (Max Dev: 1.83e-04) |
+| **EVE C++ Engine2** | 13.5301 ±  0.6502 ms | 0.05x | ✅ Passed (Max Dev: 1.98e-04) |
+| **KIWAKU C++ Engine** | 125.1011 ±  3.3063 ms | 0.01x | ✅ Passed (Max Dev: 1.83e-04) |
 
 
 ### Linux Docker System Information
 
 | Engine / Backend | Execution Time (ms) | Speedup vs. NumPy | Status Verification |
 | :--- | :---: | :---: | :--- |
-| **NumPy (np.dot) — Baseline** | 5.0644 ms | *1.00x* | *Reference Standard* |
 | **CuPy (GPU) Loop** | 0.0901 ±  0.0273 ms | **151.6x** | ✅ Passed (Max Dev: 1.07e-04) |
 | **Kokkos C++ Engine** | 0.1360 ±  0.010 ms | **100.42x** | ✅ Passed (Max Dev: 1.83e-04) |
 | **pyCUDA (GPU) Loop** | 0.1705 ±  0.0459 ms | **80.12x** | ✅ Passed (Max Dev: 1.83e-04) |
 | **CUDA (GPU) Loop** | 0.2532 ±  0.0362 ms | **53.95x** | ✅ Passed (Max Dev: 1.83e-04) |
 | **Numba JIT Loop** | 11.1702 ±  0.3146 ms | 1.22x | ✅ Passed (Max Dev: 1.83e-04) |
 | **Fortran GPU Engine** | 11.3860 ±  1.5864 ms | 1.20x | ✅ Passed (Max Dev: 2.29e-04) |
+| **NumPy (np.dot) — Baseline** | 5.0644 ms | *1.00x* | *Reference Standard* |
 | **EVE C++ Engine2** | 14.6450 ±  0.3200 ms | 0.93x | ✅ Passed (Max Dev: 1.98e-04) |
 | **KIWAKU C++ Engine** | 165.3427 ±  6.0889 ms | 0.08x | ✅ Passed (Max Dev: 1.83e-04) |
 | **Fortran CPU Engine** | 211.9286 ±  4.4525 ms | 0.06x | ✅ Passed (Max Dev: 1.07e-04) |
 
+New results 11/10/2026:
+================================================================================
+ MATRIX MULTIPLICATION (512,513) on (513,514) PERFORMANCE COMPARISON     
+================================================================================
+NumPy (np.dot) Time  :     1.3714 (median:     0.5491) ±  1.6641 ms
+--------------------------------------------------------------------------------
+CuPy (GPU) Loop                :            0.0955 (median:     0.0859) ±  0.0409 ms    ( 14.36x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 1.22e-04
+--------------------------------------------------------------------------------
+KOKKOS C++ Engine              :            0.1276 (median:     0.1237) ±  0.0135 ms    ( 10.75x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
+CUDA (GPU) Loop                :            0.1346 (median:     0.1291) ±  0.0138 ms    ( 10.19x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
+pyCUDA (GPU) Loop              :            0.1584 (median:     0.1428) ±  0.0556 ms    (  8.66x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
+Fortran GPU Engine             :            2.3681 (median:     2.1709) ±  0.5997 ms    (  0.58x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
+Numba JIT Loop                 :           11.2062 (median:    11.1675) ±  0.4830 ms    (  0.12x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
+EVE C++ Engine2                :           15.0333 (median:    14.7576) ±  1.3841 ms    (  0.09x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
+KIWAKU C++ Engine              :          169.9970 (median:   165.9857) ±  8.9616 ms    (  0.01x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
+Fortran CPU Engine             :          210.5736 (median:   210.4450) ±  5.6299 ms    (  0.01x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 2.29e-04
+--------------------------------------------------------------------------------
 Environment:
 
 * **OS**: Linux 6.18.33.2-microsoft-standard-WSL2

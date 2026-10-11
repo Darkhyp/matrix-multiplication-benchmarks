@@ -3,7 +3,7 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
- #pragma once
+#pragma once
 
 void launch_matmul_kernel(
     const float* dA,
@@ -11,5 +11,7 @@ void launch_matmul_kernel(
     float* dC,
     int rows_A,
     int cols_A,
-    int cols_B
+    int cols_B,
+    int blockx,
+    int blocky
     );

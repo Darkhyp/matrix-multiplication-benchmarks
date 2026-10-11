@@ -3,15 +3,27 @@
 # e-mail: a.v.korovin73@gmail.com
 # SPDX-License-Identifier: MIT
 
+import os
+# Important: before importing hpc_benchmark_core or running OpenACC
+os.environ["ACC_CUDA_FORCE_PRIMARY_CONTEXT"] = "1"
+
 import platform
 import time
+from pathlib import Path
 
 import numpy as np
 import pycuda.driver as cuda
-import pycuda.autoinit  # Automatically initializes the CUDA context
 from pycuda.compiler import SourceModule
-from pathlib import Path
 
+import pycuda.driver as cuda
+
+
+cuda.init()
+device = cuda.Device(0)
+
+# Use CUDA primary context
+ctx = device.retain_primary_context()
+ctx.push()
 
 if platform.system() == "Linux":
     print(f"{Path(__file__).name}: Running on Linux")
@@ -27,27 +39,36 @@ else:
     ]
 
 # the raw C++ CUDA kernel
-mod = SourceModule("""
-    __global__ void pycuda_matmul(const float *A, const float *B, float *C, 
-                                  int N, int M, int P) 
+mod = SourceModule(r"""
+    __global__ void pycuda_matmul(
+        const float *A,
+        const float *B,
+        float *C,
+        int N,
+        int M,
+        int P)
     {
         int row = blockIdx.y * blockDim.y + threadIdx.y;
         int col = blockIdx.x * blockDim.x + threadIdx.x;
 
-        if (row < N && col < P) {
+        if (row < N && col < P)
+        {
             float sum = 0.0f;
-            for (int k = 0; k < M; ++k) {
+
+            for (int k = 0; k < M; ++k)
                 sum += A[row * M + k] * B[k * P + col];
-            }
+
             C[row * P + col] = sum;
         }
     }
     """,
-    options=nvcc_options
+    options=nvcc_options,
+    arch = "sm_89",
 )
 
 def pyCUDA_matrix_dot(A, B, WARMUP=False):
-    pycuda.autoinit.context.push()
+    # pycuda.autoinit.context.push()
+    # ctx.push()
 
     rows_A, cols_A, cols_B = A.shape[0], A.shape[1], B.shape[1]
 
@@ -55,7 +76,7 @@ def pyCUDA_matrix_dot(A, B, WARMUP=False):
         # Get the compiled kernel function reference
         matmul_kernel = mod.get_function("pycuda_matmul")
 
-        # 2. Allocate VRAM memory on the GPU
+        # Allocate VRAM memory on the GPU
         A_gpu_pycuda = cuda.mem_alloc(A.nbytes)
         B_gpu_pycuda = cuda.mem_alloc(B.nbytes)
         C_gpu_pycuda = cuda.mem_alloc(rows_A * cols_B * A.itemsize)
@@ -101,4 +122,7 @@ def pyCUDA_matrix_dot(A, B, WARMUP=False):
 
     finally:
         # Cleanly pop the context stack so CuPy can resume later if needed
-        pycuda.autoinit.context.pop()
+        # pycuda.autoinit.context.pop()
+        # ctx.pop()
+
+        pass

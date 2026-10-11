@@ -3,7 +3,7 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
- #include <vector>
+#include <vector>
 #include <chrono>
 #include <cuda_runtime.h>
 #include "matrix_dot.hu"
@@ -11,16 +11,19 @@
 
 namespace py = pybind11;
 
+//#define CHRONO
 
 std::pair<double, py::array_t<float>> cuda_dot(
     py::array_t<float> A,
-    py::array_t<float> B
+    py::array_t<float> B,
+    int blockx,
+    int blocky
 )
 {
-    const int rows_A = A.shape(0);
-    const int cols_A = A.shape(1);
-    const int rows_B = B.shape(0);
-    const int cols_B = B.shape(1);
+    const auto rows_A = A.shape(0);
+    const auto cols_A = A.shape(1);
+    const auto rows_B = B.shape(0);
+    const auto cols_B = B.shape(1);
 
     if (A.ndim() != 2 || B.ndim() != 2)
         throw std::runtime_error("Expected 2D arrays");
@@ -30,8 +33,8 @@ std::pair<double, py::array_t<float>> cuda_dot(
     py::buffer_info bufA = A.request();
     py::buffer_info bufB = B.request();
 
-    const int rows_C = rows_A;
-    const int cols_C = cols_B;
+    const auto rows_C = rows_A;
+    const auto cols_C = cols_B;
     py::array_t<float> C({rows_C, cols_C});
     py::buffer_info bufC = C.request();
 
@@ -52,19 +55,43 @@ std::pair<double, py::array_t<float>> cuda_dot(
     cudaMemcpy(dB, ptr_B, cols_A * cols_B * sizeof(float), cudaMemcpyHostToDevice);
 
     // Start timing
-    auto start = std::chrono::high_resolution_clock::now();
+#ifdef CHRONO
+    auto start = std::chrono::steady_clock::now();
+#else
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start);
+#endif
 
-    launch_matmul_kernel(dA, dB, dC, rows_A, cols_A, cols_B);
+    launch_matmul_kernel(dA, dB, dC, (int)rows_A, (int)cols_A, (int)cols_B, blockx, blocky);
 
+    // Launch error
     cudaError_t err = cudaGetLastError();
-
     if(err != cudaSuccess)
         throw std::runtime_error(cudaGetErrorString(err));
 
-    cudaDeviceSynchronize();
+    cudaEventRecord(stop);
+    // Wait until the kernel has finished
+    cudaEventSynchronize(stop);
+#ifdef CHRONO
+    auto end = std::chrono::steady_clock::now();
+#endif
 
-    auto end = std::chrono::high_resolution_clock::now();
+    // Execution error
+    err = cudaEventSynchronize(stop);
+    if (err != cudaSuccess)
+        throw std::runtime_error(
+            std::string("Kernel execution: ") +
+            cudaGetErrorString(err)
+        );
+
+    float duration = 0.0f;
+#ifdef CHRONO
     std::chrono::duration<double, std::milli> duration = end - start;
+#else
+    cudaEventElapsedTime(&duration, start, stop);
+#endif
 
     cudaMemcpy(ptr_C, dC, rows_A * cols_B * sizeof(float), cudaMemcpyDeviceToHost);
 
@@ -72,5 +99,9 @@ std::pair<double, py::array_t<float>> cuda_dot(
     cudaFree(dB);
     cudaFree(dC);
 
+#ifdef CHRONO
     return {duration.count(), C};
+#else
+    return {duration, C};
+#endif
 }

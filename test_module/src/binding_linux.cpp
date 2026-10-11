@@ -3,7 +3,7 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
- #include <pybind11/pybind11.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include "EVE/matrix_op.h"
@@ -90,12 +90,14 @@ PYBIND11_MODULE(hpc_benchmark_core, m) {
     );
 
     m.def("cuda_dot", &cuda_dot, "Optimized streaming EVE matrix dot product",
-        py::arg("A"), py::arg("B")
+        py::arg("A"), py::arg("B"), py::arg("blockx"), py::arg("blocky")
     );
 
     m.def("kokkos_dot", &kokkos_dot, "Kokkos matrix multiplication execution layer",
-        py::arg("A"), py::arg("B")
+        py::arg("A"), py::arg("B"), py::arg("blockx"), py::arg("blocky")
     );
+    m.def("finalize_kokkos", &finalize_kokkos_once,
+          "Finalise Kokkos avant la sortie du processus");
 
     m.def("kiwaku_dot", &kiwaku_dot, "Kiwaku Layout Managed CPU Matrix Multiplication",
         py::arg("A"), py::arg("B")

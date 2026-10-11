@@ -5,6 +5,8 @@
 
 import functools
 import math
+import statistics
+
 
 def benchmark(text, n=10, warmup=True):
     def decorator(func):
@@ -20,13 +22,18 @@ def benchmark(text, n=10, warmup=True):
                 execution_time, result = func(A, B)
                 times.append(execution_time)
 
-            mean = sum(times) / len(times)
-            rms = math.sqrt(sum((t - mean) ** 2 for t in times) / len(times))
+            median = statistics.median(times)
+            mean = statistics.mean(times)
+            stdev = statistics.stdev(times)
+
+            # mean = sum(times) / len(times)
+            # stdev = math.sqrt(sum((t - mean) ** 2 for t in times) / len(times))
 
             return {
                 "comment": text,
                 "mean": mean,
-                "rms": rms,
+                "median": median,
+                "stdev": stdev,
                 "runs": times,
                 "result": result,
             }

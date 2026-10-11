@@ -107,7 +107,7 @@ def print_system_info():
 
     freq = psutil.cpu_freq()
     if freq is not None:
-        print(f"CPU Frequency   : {freq.max:.2f} MHz")
+        print(f"CPU Frequency   : {freq.current:.2f} MHz")
 
     ram = psutil.virtual_memory().total / (1024 ** 3)
     print(f"System RAM      : {ram:.2f} GB")

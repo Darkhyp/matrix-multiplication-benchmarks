@@ -3,7 +3,7 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
- #pragma once
+#pragma once
 #include <vector>
 #include <pybind11/numpy.h>
 

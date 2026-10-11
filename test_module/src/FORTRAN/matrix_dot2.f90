@@ -15,17 +15,14 @@
     integer :: i, j, k
     integer(c_long_long) :: start_count, end_count, rate
 
+
     ! Start CPU/GPU sync tracking timer
     call system_clock(start_count, rate)
 
     ! nvfortran automatically converts this block into a CUDA Kernel Grid
     ! shared memory management and thread configurations are handled by the compiler
-!    do concurrent (j = 1:P, i = 1:N) local(k)
-!        C(i, j) = 0.0_c_float
-!        do k = 1, M
-!            C(i, j) = C(i, j) + A(i, k) * B(k, j)
-!        end do
-!    end do
+
+    !$acc parallel loop collapse(2)
     do j = 1, P
         do i = 1, N
             C(i, j) = 0.0_c_float
@@ -35,6 +32,8 @@
         end do
     end do
 
+    !$acc wait
     call system_clock(end_count)
+
     elapsed_ms = (real(end_count - start_count, c_double) / real(rate, c_double)) * 1000.0_c_double
 end subroutine matmul_gpu

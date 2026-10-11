@@ -107,13 +107,13 @@ RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
 # Python tools
 # -----------------------------------------------------------------------------
 RUN python3 -m pip install \
-    --root-user-action=ignore \
     --disable-pip-version-check \
     --no-cache-dir \
     --upgrade \
     pip \
     setuptools \
-    wheel
+    wheel \
+    psutil
 
 RUN python3 -m pip install \
     numpy \

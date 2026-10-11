@@ -3,12 +3,14 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
- #include <Kokkos_Core.hpp>
+#include <Kokkos_Core.hpp>
 #include <chrono>
 #include <vector>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+
+// #define CHRONO
 
 namespace py = pybind11;
 
@@ -35,7 +37,9 @@ using TeamPolicy     = Kokkos::MDRangePolicy<Kokkos::Rank<2>, ExecutionSpace>;
 
 std::pair<double, py::array_t<float>> kokkos_dot(
     py::array_t<float> A,
-    py::array_t<float> B
+    py::array_t<float> B,
+    int blockx,
+    int blocky
 )
 {
     const int rows_A = A.shape(0);
@@ -63,8 +67,6 @@ std::pair<double, py::array_t<float>> kokkos_dot(
     const float* ptr_B = static_cast<const float*>(bufB.ptr);
     float* ptr_C = static_cast<float*>(bufC.ptr);
 
-    double elapsed_ms = 0.0;
-
     // Allocate optimized layout views on the GPU Device Space
     ConstHostView2D host_A(ptr_A, rows_A, cols_A);
     ConstHostView2D host_B(ptr_B, cols_A, cols_B);
@@ -80,10 +82,15 @@ std::pair<double, py::array_t<float>> kokkos_dot(
     Kokkos::deep_copy(dev_B, host_B);
 
     // --- Pure Execution Benchmark ---
-    auto start = std::chrono::high_resolution_clock::now();
+    double elapsed_ms = 0.0;
+#ifdef CHRONO
+    auto start = std::chrono::steady_clock::now();
+#else
+    Kokkos::Timer timer;
+#endif
 
     // Execute matrix multiplication using optimized 16x16 CUDA Thread Blocks
-    TeamPolicy policy({0, 0}, {rows_A, cols_B}, {16, 16});
+    TeamPolicy policy({0, 0}, {rows_A, cols_B}, {blockx, blocky});
 
     Kokkos::parallel_for("matmul", policy,
     KOKKOS_LAMBDA (const int i, const int j) {
@@ -97,10 +104,21 @@ std::pair<double, py::array_t<float>> kokkos_dot(
     // Sync and block host execution thread until GPU finishes the kernel pipeline
     Kokkos::fence();
 
-    auto end = std::chrono::high_resolution_clock::now();
+#ifdef CHRONO
+    auto end = std::chrono::steady_clock::now();
     elapsed_ms = std::chrono::duration<double, std::milli>(end - start).count();
+#else
+    elapsed_ms = timer.seconds() * 1000.0;
+#endif
 
     Kokkos::deep_copy(host_C, dev_C);
 
     return {elapsed_ms, C};
+}
+
+void finalize_kokkos_once() {
+    if (Kokkos::is_initialized() && !Kokkos::is_finalized()) {
+        Kokkos::fence();
+        Kokkos::finalize();
+    }
 }

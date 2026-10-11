@@ -3,12 +3,16 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
- #pragma once
+#pragma once
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
 std::pair<double, py::array_t<float>> kokkos_dot(
     py::array_t<float> A,
-    py::array_t<float> B
+    py::array_t<float> B,
+    int blockx,
+    int blocky
 );
+
+void finalize_kokkos_once();

@@ -5,14 +5,13 @@
 
 @echo off
 SETLOCAL Enabledelayedexpansion
+chcp 65001 >nul
 
 :: 1. Navigate to the script's directory
 F:
 cd \usr\PycharmProjects\VEC_tests\test_module_linux
 
-echo =======================================================================
-echo Checking Docker Daemon State...
-echo =======================================================================
+call "%~dp0..\print_box.bat" "Checking Docker Daemon State..."
 :: Check if Docker engine is running
 docker info >nul 2>&1
 if %errorlevel% neq 0 (
@@ -25,21 +24,16 @@ if %errorlevel% neq 0 (
 
 echo Docker is running.
 
-echo =======================================================================
-echo Ensuring Container is up and Volumes are Remounted...
-echo =======================================================================
+call "%~dp0..\print_box.bat" "Ensuring Container is up and Volumes are Remounted..."
 :: '--build' checks if your Dockerfile changed. If it didn't, it skips
 :: straight to starting the container using your live local folder changes.
 docker compose up -d --build
 
-echo =======================================================================
-echo Running Benchmark Suite Inside Pure Linux Environment...
-echo =======================================================================
+call "%~dp0..\print_box.bat" "Running Benchmark Suite Inside Pure Linux Environment..."
 :: This non-interactive command sends the script directly into the container,
 :: runs it, streams the live output to your terminal, and exits back to CMD when done.
-docker compose exec -T hpc_stack bash -c "chmod +x test_module_linux/run.sh && ./test_module_linux/run.sh"
+docker compose exec -T hpc_stack bash -c "chmod +x test_module_linux/make_module.sh"
+docker compose exec -T hpc_stack bash -c "./test_module_linux/make_module.sh"
 
-echo =======================================================================
-echo Test Pipeline Execution Finished!
-echo =======================================================================
+call "%~dp0..\print_box.bat" "Test Pipeline Execution Finished!"
 pause
