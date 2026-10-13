@@ -12,3 +12,9 @@ std::pair<double, py::array_t<float>> kiwaku_dot(
     py::array_t<float> A,
     py::array_t<float> B
 );
+
+// modified dot function
+std::pair<double, py::array_t<float>> kiwaku_dot2(
+    py::array_t<float> A,
+    py::array_t<float> B
+);

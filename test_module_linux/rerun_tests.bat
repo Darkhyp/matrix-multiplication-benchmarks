@@ -7,13 +7,10 @@
 SETLOCAL Enabledelayedexpansion
 chcp 65001 >nul
 
-:: 1. Navigate to the script's directory
-F:
-cd \usr\PycharmProjects\VEC_tests\test_module_linux
 
 echo "Run install.bat before"
 call "%~dp0..\print_box.bat" "Running Benchmark Suite Inside Pure Linux Environment..."
-REM 1. Check that Docker CLI is installed
+REM Check that Docker CLI is installed
 echo Is Docker CLI installed...
 docker --version >nul 2>&1
 if errorlevel 1 (
@@ -21,7 +18,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM 2. Check that Docker Engine is running
+REM Check that Docker Engine is running
 echo Is Docker Engine running...
 docker info >nul 2>&1
 if errorlevel 1 (
@@ -30,7 +27,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM 3. Check that the Compose service is running
+REM Check that the Compose service is running
 echo Is Compose service running...
 docker compose ps --status running --services | findstr /x /c:"hpc_stack" >nul
 if errorlevel 1 (
@@ -40,7 +37,7 @@ if errorlevel 1 (
     if errorlevel 1 exit /b 1
 )
 
-REM 4. Run tests inside the container
+REM Run tests inside the container
 echo Running tests.py...
 docker compose exec -T hpc_stack bash -c "python3 -u tests.py"
 set "rc=%ERRORLEVEL%"

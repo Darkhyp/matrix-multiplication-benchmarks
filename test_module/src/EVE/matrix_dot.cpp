@@ -7,6 +7,8 @@
 #include <vector>
 #include <chrono>
 #include <iostream>
+#include <thread>
+#include <omp.h>
 #include <pybind11/numpy.h>
 
 namespace py = pybind11;
@@ -28,13 +30,13 @@ std::pair<double, py::array_t<float>> eve_dot(
     if (cols_A != rows_B)
         throw std::runtime_error("A and B are not compatible");
 
-    py::buffer_info bufA = A.request();
-    py::buffer_info bufB = B.request();
+    auto bufA = A.request();
+    auto bufB = B.request();
 
     const auto rows_C = rows_A;
     const auto cols_C = cols_B;
     py::array_t<float> C({rows_C, cols_C});
-    py::buffer_info bufC = C.request();
+    auto bufC = C.request();
 
     const float* ptr_A = static_cast<const float*>(bufA.ptr);
     const float* ptr_B = static_cast<const float*>(bufB.ptr);
@@ -43,12 +45,22 @@ std::pair<double, py::array_t<float>> eve_dot(
     // Zero the output buffer before accumulating into it
     std::fill(ptr_C, ptr_C + static_cast<size_t>(rows_C) * cols_C, 0.0f);
 
+    // Détection dynamique du nombre de cœurs/threads disponibles
+    unsigned int num_threads = std::thread::hardware_concurrency();
+    if (num_threads == 0) {
+        num_threads = 4; // Valeur de secours si la détection échoue
+    }
+    omp_set_num_threads(num_threads);
+//    std::cout << "Threads utilisés : " << omp_get_max_threads() << std::endl;
+
     // Start timing
     auto start = std::chrono::steady_clock::now();
 
     const auto simd_width = eve::wide<float>::size();
 
     // Perform Matrix Multiplication using EVE for the innermost loop
+    // schedule(guided) ou schedule(dynamic) peut être utile si la charge par ligne varie
+    #pragma omp parallel for schedule(static)
     for (std::ptrdiff_t i = 0; i < rows_A; ++i) {
         for (std::ptrdiff_t k = 0; k < cols_A; ++k) {
             float a_ik = ptr_A[i * cols_A + k];

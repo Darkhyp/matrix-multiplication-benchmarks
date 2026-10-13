@@ -32,9 +32,9 @@ if platform.system() == "Linux":
     ]
 else:
     print(f"{Path(__file__).name}: Running on Windows")
-    from test_module.pathes import MSVC_BIN_DIR
+    from test_module.paths import MSVC_BIN
     nvcc_options = [
-        "-ccbin", MSVC_BIN_DIR,
+        "-ccbin", MSVC_BIN,
         "-allow-unsupported-compiler",
     ]
 

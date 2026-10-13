@@ -13,7 +13,10 @@ namespace py = pybind11;
 
 //#define CHRONO
 
-std::pair<double, py::array_t<float>> cuda_dot(
+
+// LaunchFunc = launch_matmul_kernel or launch_matmul_kernel_optimized
+template<auto LaunchFunc>
+std::pair<double, py::array_t<float>> cuda_dot_T(
     py::array_t<float> A,
     py::array_t<float> B,
     int blockx,
@@ -64,7 +67,7 @@ std::pair<double, py::array_t<float>> cuda_dot(
     cudaEventRecord(start);
 #endif
 
-    launch_matmul_kernel(dA, dB, dC, (int)rows_A, (int)cols_A, (int)cols_B, blockx, blocky);
+    LaunchFunc(dA, dB, dC, (int)rows_A, (int)cols_A, (int)cols_B, blockx, blocky);
 
     // Launch error
     cudaError_t err = cudaGetLastError();
@@ -104,4 +107,27 @@ std::pair<double, py::array_t<float>> cuda_dot(
 #else
     return {duration, C};
 #endif
+}
+
+
+// Fonction 1 : Utilise le noyau standard
+std::pair<double, py::array_t<float>> cuda_dot(
+    py::array_t<float> A,
+    py::array_t<float> B,
+    int blockx,
+    int blocky
+)
+{
+    return cuda_dot_T<launch_matmul_kernel>(A, B, blockx, blocky);
+}
+
+// Fonction 2 : Utilise le noyau optimisé avec shared memory / tiling
+std::pair<double, py::array_t<float>> cuda_dot2(
+    py::array_t<float> A,
+    py::array_t<float> B,
+    int blockx,
+    int blocky
+)
+{
+    return cuda_dot_T<launch_matmul_kernel_optimized>(A, B, blockx, blocky);
 }

@@ -15,3 +15,10 @@ std::pair<double, py::array_t<float>> cuda_dot(
     int blockx,
     int blocky
 );
+
+std::pair<double, py::array_t<float>> cuda_dot2(
+    py::array_t<float> A,
+    py::array_t<float> B,
+    int blockx,
+    int blocky
+);

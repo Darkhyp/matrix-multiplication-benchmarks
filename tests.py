@@ -2,8 +2,10 @@
 # Author: Alexandre Korovin
 # e-mail: a.v.korovin73@gmail.com
 # SPDX-License-Identifier: MIT
-
+import os
 import platform
+import sys
+
 import numpy as np
 import cupy as cp
 import time
@@ -16,10 +18,14 @@ from test_functions.tools import print_system_info
 
 if platform.system() == "Linux":
     print(f"{Path(__file__).name}: Running on Linux")
-    import hpc_benchmark_core as TEST
 else:
     print(f"{Path(__file__).name}: Running on Windows")
-    import test_module as TEST
+
+current_dir = Path(__file__).parent
+test_module_dir = current_dir / "test_module"
+if test_module_dir.is_dir() and str(test_module_dir) not in sys.path:
+    sys.path.insert(0, str(test_module_dir))
+import hpc_benchmark_core as TEST
 
 # -------------------------------------------------------------------------
 # Warmup Calls (Important: Numba/EVE/GPU compiles on the very first execution)
@@ -28,11 +34,14 @@ WARMUP = True
 # WARMUP = False
 N_repetitions = 50
 # blockx, blocky = 16, 8
-# blockx, blocky = 16, 16
+blockx, blocky = 16, 16
 # blockx, blocky = 32, 16
 # blockx, blocky = 16, 32
-blockx, blocky = 8, 64
+# blockx, blocky = 8, 64
 # blockx, blocky = 64, 8
+
+# Define dimensions
+N, M, P = 512, 512 + 1, 512 + 2
 
 
 @benchmark("numpy (CPU) Loop", n=N_repetitions, warmup=WARMUP)
@@ -60,22 +69,39 @@ def numba_test(A, B):
 @benchmark("CUDA cu (GPU) Loop", n=N_repetitions, warmup=WARMUP)
 def cuda_test(A, B):
     return TEST.cuda_dot(A, B, blockx, blocky)
+@benchmark("CUDA cu (GPU) Loop2", n=N_repetitions, warmup=WARMUP)
+def cuda_test2(A, B):
+    return TEST.cuda_dot2(A, B, blockx, blocky)
 
 @benchmark("pyCUDA (GPU) Loop", n=N_repetitions, warmup=WARMUP)
 def pycuda_test(A, B):
     return pyCUDA_matrix_dot(A, B)
 
-@benchmark("EVE C++ Engine2", n=N_repetitions, warmup=WARMUP)
-def eve_test(A, B):
-    return TEST.eve_dot(A, B)
-
 @benchmark("KOKKOS C++ Engine", n=N_repetitions, warmup=WARMUP)
 def kokkos_test(A, B):
     return TEST.kokkos_dot(A, B, blockx, blocky)
 
+@benchmark("EIGEN C++ Engine", n=N_repetitions, warmup=WARMUP)
+def eigen_test(A, B):
+    return TEST.eigen_dot(A, B)
+
+@benchmark("ARMADILLO C++ Engine", n=N_repetitions, warmup=WARMUP)
+def armadillo_test(A, B):
+    return TEST.armadillo_dot(A, B)
+
+@benchmark("EVE C++ Engine", n=N_repetitions, warmup=WARMUP)
+def eve_test(A, B):
+    return TEST.eve_dot(A, B)
+@benchmark("EVE C++ Engine2", n=N_repetitions, warmup=WARMUP)
+def eve_test2(A, B):
+    return TEST.eve_dot2(A, B)
+
 @benchmark("KIWAKU C++ Engine", n=N_repetitions, warmup=WARMUP)
 def kiwaku_test(A, B):
     return TEST.kiwaku_dot(A, B)
+@benchmark("KIWAKU C++ Engine2", n=N_repetitions, warmup=WARMUP)
+def kiwaku_test2(A, B):
+    return TEST.kiwaku_dot2(A, B)
 
 if platform.system() == "Linux":
     @benchmark("Fortran CPU Engine", n=N_repetitions, warmup=WARMUP)
@@ -90,9 +116,6 @@ if platform.system() == "Linux":
 if __name__ == '__main__':
     print_system_info()
     print()
-
-    # Define dimensions
-    N, M, P = 512, 512+1, 512+2
 
     # Create two random matrices
     A = np.random.rand(N, M).astype(np.float32)
@@ -122,8 +145,11 @@ if __name__ == '__main__':
     finally:
         TEST.finalize_kokkos()
 
-    print("Running CUDA (GPU Acceleration) Matrix Multiplication...")
-    results.append(cuda_test(A, B))
+    # Call the C++ extension with CUDA
+    # print("Running CUDA (GPU Acceleration) Matrix Multiplication...")
+    # results.append(cuda_test(A, B))
+    print("Running CUDA (GPU Acceleration) Matrix Multiplication2...")
+    results.append(cuda_test2(A, B))
 
     # Call the python with PyCUDA
     print("Running PyCUDA Matrix Multiplication...")
@@ -132,17 +158,29 @@ if __name__ == '__main__':
     ctx.pop()
     ctx.detach()
 
+    # Call the C++ extension with EIGEN
+    print("Running EIGEN Matrix Multiplication...")
+    results.append(eigen_test(A, B))
+
+    # Call the C++ extension with ARMADILLO
+    print("Running ARMADILLO Matrix Multiplication...")
+    results.append(armadillo_test(A, B))
+
     # Call the python with NUMBA
     print("Running numba Matrix Multiplication...")
     results.append(numba_test(A, B))
 
     # Call the C++ extension with EVE
-    print("Running EVE Matrix Multiplication...")
-    results.append(eve_test(A, B))
+    # print("Running EVE Matrix Multiplication...")
+    # results.append(eve_test(A, B))
+    print("Running EVE Matrix Multiplication2...")
+    results.append(eve_test2(A, B))
 
     # Call the C++ extension with KIWAKU
-    print("Running KIWAKU Matrix Multiplication...")
-    results.append(kiwaku_test(A, B))
+    # print("Running KIWAKU Matrix Multiplication...")
+    # results.append(kiwaku_test(A, B))
+    print("Running KIWAKU Matrix Multiplication2...")
+    results.append(kiwaku_test2(A, B))
 
     # Call the fortran functions
     if platform.system() == "Linux":
@@ -167,7 +205,7 @@ if __name__ == '__main__':
         t = result["mean"]
         tm = result["median"]
         dt = result["stdev"]
-        print(f'{result["comment"]:30s} :\t{t:10.4f} (median: {tm:10.4f}) ± {dt:7.4f} ms\t({numpy_execution_time/t:6.2f}x compare to numpy)')
+        print(f'{result["comment"]:30s} :\t{t:10.4f} (median: {tm:10.4f}) ± {dt:7.4f} ms\t({numpy_execution_time/t:6.2f}|{numpy_median_time/tm:6.2f}x compare to numpy)')
         C_test = result["result"]
         matrices_match = np.allclose(C_test, C_numpy, rtol=1e-05, atol=1e-05)
         if matrices_match:

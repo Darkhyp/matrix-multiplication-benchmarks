@@ -7,10 +7,6 @@
 SETLOCAL Enabledelayedexpansion
 chcp 65001 >nul
 
-:: 1. Navigate to the script's directory
-F:
-cd \usr\PycharmProjects\VEC_tests\test_module_linux
-
 call "%~dp0..\print_box.bat" "Checking Docker Daemon State..."
 :: Check if Docker engine is running
 docker info >nul 2>&1

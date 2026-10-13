@@ -9,6 +9,9 @@ KIWAKU_SRC/
 RABERU_SRC/
 KUMI_SRC/
 EVE_SRC/
+EIGEN_SRC/
+ARMADILLO_SRC/
+vcpkg/
 
 # Python cache
 __pycache__/

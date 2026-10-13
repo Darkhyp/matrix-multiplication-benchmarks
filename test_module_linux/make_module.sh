@@ -53,7 +53,7 @@ else
 fi
 
 print_box "Building/Rebuilding Python C++/Fortran Extensions"
-cd ${WORK}/test_module_linux
+cd ${WORK}/test_module
 rm -rf build/ *.egg-info/ *.so
 #pip install -e .
 pip install -e . --no-build-isolation -v
@@ -62,7 +62,7 @@ pip install -e . --no-build-isolation -v
 ls -l *.so
 ldd hpc_benchmark_core*.so | grep -Ei "matmul_acc|acc|nvf|cuda"
 
-#export PYTHONPATH="${PYTHONPATH}:${WORK}/test_module_linux"
+#export PYTHONPATH="${PYTHONPATH}:${WORK}/test_module"
 cd ${WORK}
 
 print_box "Launching Benchmark Suite"

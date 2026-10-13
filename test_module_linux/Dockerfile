@@ -71,7 +71,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         gcc-12 \
         g++-12 \
         gfortran-12 \
-        libopenblas-dev && \
+        libarmadillo-dev \
+        liblapack-dev \
+        libopenblas-dev \
+        libeigen3-dev && \
     rm -rf /var/lib/apt/lists/*
 
 

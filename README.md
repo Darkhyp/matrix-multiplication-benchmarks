@@ -106,45 +106,53 @@ The benchmarks below were captured natively under the following hardware environ
 | **KIWAKU C++ Engine** | 165.3427 ±  6.0889 ms | 0.08x | ✅ Passed (Max Dev: 1.83e-04) |
 | **Fortran CPU Engine** | 211.9286 ±  4.4525 ms | 0.06x | ✅ Passed (Max Dev: 1.07e-04) |
 
-New results 11/10/2026:
+New results 12/10/2026:
 ================================================================================
  MATRIX MULTIPLICATION (512,513) on (513,514) PERFORMANCE COMPARISON     
 ================================================================================
-NumPy (np.dot) Time  :     1.3714 (median:     0.5491) ±  1.6641 ms
+NumPy (np.dot) Time  :     3.0168 (median:     3.9705) ±  1.6622 ms
 --------------------------------------------------------------------------------
-CuPy (GPU) Loop                :            0.0955 (median:     0.0859) ±  0.0409 ms    ( 14.36x compare to numpy)
+CuPy (GPU) Loop                :            0.0880 (median:     0.0829) ±  0.0201 ms    ( 34.27| 47.92x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 1.22e-04
 --------------------------------------------------------------------------------
-KOKKOS C++ Engine              :            0.1276 (median:     0.1237) ±  0.0135 ms    ( 10.75x compare to numpy)
+CUDA cu (GPU) Loop2            :            0.1146 (median:     0.1114) ±  0.0088 ms    ( 26.32| 35.64x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------
-CUDA (GPU) Loop                :            0.1346 (median:     0.1291) ±  0.0138 ms    ( 10.19x compare to numpy)
+KOKKOS C++ Engine              :            0.1228 (median:     0.1211) ±  0.0079 ms    ( 24.57| 32.80x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------
-pyCUDA (GPU) Loop              :            0.1584 (median:     0.1428) ±  0.0556 ms    (  8.66x compare to numpy)
+pyCUDA (GPU) Loop              :            0.1242 (median:     0.1211) ±  0.0105 ms    ( 24.30| 32.80x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------
-Fortran GPU Engine             :            2.3681 (median:     2.1709) ±  0.5997 ms    (  0.58x compare to numpy)
+EIGEN C++ Engine               :            0.8818 (median:     0.5286) ±  1.4949 ms    (  3.42|  7.51x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 1.37e-04
+--------------------------------------------------------------------------------
+ARMADILLO C++ Engine           :            1.1079 (median:     0.8731) ±  1.1139 ms    (  2.72|  4.55x compare to numpy)
+        ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
+                Max absolute numerical deviation: 1.37e-04
+--------------------------------------------------------------------------------
+EVE C++ Engine2                :            1.8787 (median:     1.4840) ±  0.7796 ms    (  1.61|  2.68x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------
-Numba JIT Loop                 :           11.2062 (median:    11.1675) ±  0.4830 ms    (  0.12x compare to numpy)
+KIWAKU C++ Engine2             :            1.9075 (median:     1.5239) ±  0.9077 ms    (  1.58|  2.61x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------
-EVE C++ Engine2                :           15.0333 (median:    14.7576) ±  1.3841 ms    (  0.09x compare to numpy)
+Fortran GPU Engine             :            2.1068 (median:     1.9119) ±  1.3489 ms    (  1.43|  2.08x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------
-KIWAKU C++ Engine              :          169.9970 (median:   165.9857) ±  8.9616 ms    (  0.01x compare to numpy)
+Numba JIT Loop                 :           11.0448 (median:    10.7296) ±  1.4754 ms    (  0.27|  0.37x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------
-Fortran CPU Engine             :          210.5736 (median:   210.4450) ±  5.6299 ms    (  0.01x compare to numpy)
+Fortran CPU Engine             :          210.3948 (median:   209.8294) ±  6.6362 ms    (  0.01|  0.02x compare to numpy)
         ✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!
                 Max absolute numerical deviation: 2.29e-04
 --------------------------------------------------------------------------------

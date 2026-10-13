@@ -3,11 +3,13 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
+#include <chrono>
+#include <vector>
+#include <thread>
+#include <omp.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
-#include <chrono>
-#include <vector>
 
 // Include Kiwaku headers
 #include <kwk/kwk.hpp>
@@ -47,9 +49,15 @@ std::pair<double, py::array_t<float>> kiwaku_dot(
     auto kiwaku_B = kwk::view{ kwk::source = ptr_B, kwk::of_size(cols_A, cols_B) };
     auto kiwaku_C = kwk::view{ kwk::source = ptr_C, kwk::of_size(rows_A, cols_B) };
 
-    // Measure Execution performance loop
-    auto start = std::chrono::high_resolution_clock::now();
+    // Configuration dynamique des cœurs/threads
+    unsigned int num_threads = std::thread::hardware_concurrency();
+    if (num_threads == 0) num_threads = 4;
+    omp_set_num_threads(num_threads);
 
+    // Measure Execution performance loop
+    auto start = std::chrono::steady_clock::now();
+
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < rows_A; ++i) {
         for (int j = 0; j < cols_B; ++j) {
             float sum = 0.0f;
@@ -60,7 +68,7 @@ std::pair<double, py::array_t<float>> kiwaku_dot(
         }
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
     double elapsed_ms = std::chrono::duration<double, std::milli>(end - start).count();
 
     return {elapsed_ms, C};
