@@ -120,15 +120,15 @@ def readme_print(results, ref_results):
     numpy_execution_time, numpy_median_time, dnumpy_execution_time, C_numpy = ref_results["mean"], ref_results[
         "median"], ref_results["stdev"], ref_results["result"]
 
-    print("| Engine / Backend               | Execution Time (ms) | median (ms) | Speedup vs. NumPy | Status Verification      |")
-    print("|:-------------------------------|:-------------------:|:-----------:|:-----------------:|:-------------------------|")
-    print(f"| **NumPy (np.dot)**             | {numpy_execution_time:10.4f} ±{dnumpy_execution_time:7.4f} | {numpy_median_time:10.4f} | *1.00x*        | *Reference Standard*         |")
+    print("| Engine / Backend               | Execution Time (ms) | median (ms) | Speedup vs. NumPy | Status Verification          |")
+    print("|:-------------------------------|:-------------------:|:-----------:|:-----------------:|:-----------------------------|")
+    print(f"| **NumPy (np.dot)**             | {numpy_execution_time:10.4f} ±{dnumpy_execution_time:7.4f} | {numpy_median_time:11.4f} | *1.00x*           | *Reference Standard*         |")
 
     for result in results:
         t = result["mean"]
         tm = result["median"]
         dt = result["stdev"]
-        print(f'| {"**" + result["comment"]+"**":30s} | {t:10.4f} ±{dt:7.4f} | {tm:10.4f} |{numpy_execution_time/t:6.2f}({numpy_median_time/tm:6.2f})x | ', end="")
+        print(f'| {"**" + result["comment"]+"**":30s} | {t:10.4f} ±{dt:7.4f} | {tm:11.4f} |{numpy_execution_time/t:8.2f}({numpy_median_time/tm:7.2f})x | ', end="")
         C_test = result["result"]
         matrices_match = np.allclose(C_test, C_numpy, rtol=1e-05, atol=1e-05)
         if matrices_match:
@@ -225,8 +225,8 @@ if __name__ == '__main__':
     #     PERFORMANCE COMPARISON
     # *******************************
     print()
-    print("="*80)
+    print("="*121)
     print(f" MATRIX MULTIPLICATION ({N},{M}) on ({M},{P}) PERFORMANCE COMPARISON     ")
-    print("="*80)
-
-    readme_print(results, ref_results)
+    print("="*121)
+    readme_print(sorted(results, key=lambda x: x["mean"]), ref_results)
+    print("="*121)
