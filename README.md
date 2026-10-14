@@ -106,7 +106,7 @@ The benchmarks below were captured natively under the following hardware environ
 | **KIWAKU C++ Engine**  |  165.3427 ±  6.0889  |       0.08x       | ✅ Passed (Max Dev: 1.83e-04) |
 | **Fortran CPU Engine** |  211.9286 ±  4.4525  |       0.06x       | ✅ Passed (Max Dev: 1.07e-04) |
 
-### New results (Linux Docker) 13/10/2026
+### New results (Linux Docker) 14/10/2026
 
 | Engine / Backend               | Execution Time (ms) | median (ms) | Speedup vs. NumPy | Status Verification      |
 |:-------------------------------|:-------------------:|:-----------:|:-----------------:|:-------------------------|
