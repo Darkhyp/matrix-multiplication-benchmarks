@@ -5,7 +5,6 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include <armadillo>
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
 #include <stdexcept>
@@ -14,7 +13,7 @@ static cublasHandle_t g_handle = nullptr;
 
 namespace py = pybind11;
 
-std::pair<double, py::array_t<float>> armadillo_dot_gpu(
+std::pair<double, py::array_t<float>> cublas_dot_gpu(
     py::array_t<float> A,
     py::array_t<float> B
 )
@@ -28,7 +27,6 @@ std::pair<double, py::array_t<float>> armadillo_dot_gpu(
         throw std::runtime_error("Expected 2D arrays");
     if (cols_A != rows_B)
         throw std::runtime_error("A and B are not compatible");
-
 
     if (A.ndim() != 2 || B.ndim() != 2)
         throw std::runtime_error("Expected 2D arrays");
@@ -52,24 +50,14 @@ std::pair<double, py::array_t<float>> armadillo_dot_gpu(
     const float* ptr_B = static_cast<const float*>(bufB.ptr);
     float* ptr_C = static_cast<float*>(bufC.ptr);
 
-    // Utilisation des "mem_ptr" d'Armadillo pour mapper directement les données
-    // (Attention : Armadillo gère nativement le row-major si on lui précise ou via des expressions,
-    // mais pour un contrôle total du row-major, on peut utiliser des objets d'enveloppe ou convertir si la taille est petite).
-
-    // Méthode propre avec Armadillo (en supposant des matrices contiguës)
-    arma::fmat matA(const_cast<float*>(ptr_A), rows_A, cols_A, false, true); // false = don't copy, true = strict
-    arma::fmat matB(const_cast<float*>(ptr_B), rows_B, cols_B, false, true);
-    arma::fmat matC(ptr_C, rows_A, cols_B, false, true);
-
-
     if (!g_handle) cublasCreate(&g_handle);
 
     float *dA, *dB, *dC;
     cudaMalloc(&dA, sizeof(float) * rows_A * cols_A);
     cudaMalloc(&dB, sizeof(float) * rows_B * cols_B);
     cudaMalloc(&dC, sizeof(float) * rows_A * cols_B);
-    cudaMemcpy(dA, matA.memptr(), sizeof(float) * rows_A * cols_A, cudaMemcpyHostToDevice);
-    cudaMemcpy(dB, matB.memptr(), sizeof(float) * rows_B * cols_B, cudaMemcpyHostToDevice);
+    cudaMemcpy(dA, const_cast<float*>(ptr_A), sizeof(float) * rows_A * cols_A, cudaMemcpyHostToDevice);
+    cudaMemcpy(dB, const_cast<float*>(ptr_B), sizeof(float) * rows_B * cols_B, cudaMemcpyHostToDevice);
 
     const float alpha = 1.f, beta = 0.f;
     cudaEvent_t t0, t1;
@@ -93,10 +81,10 @@ std::pair<double, py::array_t<float>> armadillo_dot_gpu(
     cudaEventRecord(t1);
     cudaEventSynchronize(t1);
 
-``    float duration_ms = 0.f;
+    float duration_ms = 0.f;
     cudaEventElapsedTime(&duration_ms, t0, t1);
 
-    cudaMemcpy(matC.memptr(), dC, sizeof(float) * rows_A * cols_B, cudaMemcpyDeviceToHost);
+    cudaMemcpy(ptr_C, dC, sizeof(float) * rows_A * cols_B, cudaMemcpyDeviceToHost);
     cudaFree(dA); cudaFree(dB); cudaFree(dC);
     cudaEventDestroy(t0); cudaEventDestroy(t1);
 

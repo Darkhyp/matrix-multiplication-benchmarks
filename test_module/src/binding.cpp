@@ -12,6 +12,7 @@
 #include "ARMADILLO/matrix_op.h"
 #include "KOKKOS/matrix_op.h"
 #include "KIWAKU/matrix_op.h"
+#include "CUBLAS/matrix_op.h"
 
 namespace py = pybind11;
 
@@ -125,7 +126,8 @@ PYBIND11_MODULE(hpc_benchmark_core, m) {
     m.def("armadillo_dot", &eigen_dot, "ARMADILLO CPU Matrix Multiplication",
         py::arg("A"), py::arg("B")
     );
-    m.def("armadillo_dot_gpu", &armadillo_dot_gpu, "ARMADILLO GPU Matrix Multiplication",
+
+    m.def("cublas_dot_gpu", &cublas_dot_gpu, "cuBLAS GPU Matrix Multiplication",
         py::arg("A"), py::arg("B")
     );
 

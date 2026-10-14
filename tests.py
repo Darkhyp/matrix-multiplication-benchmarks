@@ -88,9 +88,10 @@ def eigen_test(A, B):
 @benchmark("ARMADILLO CPU C++ Engine", n=N_repetitions, warmup=WARMUP)
 def armadillo_test(A, B):
     return TEST.armadillo_dot(A, B)
-@benchmark("ARMADILLO GPU C++ Engine", n=N_repetitions, warmup=WARMUP)
-def armadillo_test2(A, B):
-    return TEST.armadillo_dot_gpu(A, B)
+
+@benchmark("cuBLAS GPU C++ Engine", n=N_repetitions, warmup=WARMUP)
+def cublas_test(A, B):
+    return TEST.cublas_dot_gpu(A, B)
 
 @benchmark("EVE C++ Engine", n=N_repetitions, warmup=WARMUP)
 def eve_test(A, B):
@@ -115,6 +116,30 @@ if platform.system() == "Linux":
     def fortran_gpu_test(A, B):
         return TEST.matmul_gpu(A, B)
 
+def readme_print(results, ref_results):
+    numpy_execution_time, numpy_median_time, dnumpy_execution_time, C_numpy = ref_results["mean"], ref_results[
+        "median"], ref_results["stdev"], ref_results["result"]
+
+    print("| Engine / Backend               | Execution Time (ms) | median (ms) | Speedup vs. NumPy | Status Verification      |")
+    print("|:-------------------------------|:-------------------:|:-----------:|:-----------------:|:-------------------------|")
+    print(f"| **NumPy (np.dot)**             | {numpy_execution_time:10.4f} ±{dnumpy_execution_time:7.4f} | {numpy_median_time:10.4f} | *1.00x*        | *Reference Standard*         |")
+
+    for result in results:
+        t = result["mean"]
+        tm = result["median"]
+        dt = result["stdev"]
+        print(f'| {"**" + result["comment"]+"**":30s} | {t:10.4f} ±{dt:7.4f} | {tm:10.4f} |{numpy_execution_time/t:6.2f}({numpy_median_time/tm:6.2f})x | ', end="")
+        C_test = result["result"]
+        matrices_match = np.allclose(C_test, C_numpy, rtol=1e-05, atol=1e-05)
+        if matrices_match:
+            # Show peak difference
+            max_diff = np.max(np.abs(C_test - C_numpy))
+            print(f"✅ Passed (Max Dev: {max_diff:.2e}) |")
+        else:
+            # Diagnostics
+            mismatches = np.where(~np.isclose(C_test, C_numpy, rtol=1e-05, atol=1e-05))
+            print(f"❌ VERIFICATION FAILED (Max Dev: {len(mismatches[0])}) |")
+
 
 if __name__ == '__main__':
     print_system_info()
@@ -135,8 +160,7 @@ if __name__ == '__main__':
 
     # Cross-check accuracy with NumPy
     print("Running numpy Matrix Multiplication...")
-    tmp_results = numpy_test(A, B)
-    numpy_execution_time, numpy_median_time, dnumpy_execution_time, C_numpy = tmp_results["mean"], tmp_results["median"], tmp_results["stdev"], tmp_results["result"]
+    ref_results = numpy_test(A, B)
 
     print("Running CuPy (GPU Acceleration) Matrix Multiplication...")
     results.append(cupy_test(A_gpu, B_gpu))
@@ -168,8 +192,9 @@ if __name__ == '__main__':
     # Call the C++ extension with ARMADILLO
     print("Running ARMADILLO CPU Matrix Multiplication...")
     results.append(armadillo_test(A, B))
-    print("Running ARMADILLO GPU Matrix Multiplication...")
-    results.append(armadillo_test2(A, B))
+
+    print("Running cuBLAS GPU Matrix Multiplication...")
+    results.append(cublas_test(A, B))
 
     # Call the python with NUMBA
     print("Running numba Matrix Multiplication...")
@@ -203,24 +228,5 @@ if __name__ == '__main__':
     print("="*80)
     print(f" MATRIX MULTIPLICATION ({N},{M}) on ({M},{P}) PERFORMANCE COMPARISON     ")
     print("="*80)
-    print(f"NumPy (np.dot) Time  : {numpy_execution_time:10.4f} (median: {numpy_median_time:10.4f}) ± {dnumpy_execution_time:7.4f} ms")
-    print("-" * 80)
 
-    for result in results:
-        t = result["mean"]
-        tm = result["median"]
-        dt = result["stdev"]
-        print(f'{result["comment"]:30s} :\t{t:10.4f} (median: {tm:10.4f}) ± {dt:7.4f} ms\t({numpy_execution_time/t:6.2f}|{numpy_median_time/tm:6.2f}x compare to numpy)')
-        C_test = result["result"]
-        matrices_match = np.allclose(C_test, C_numpy, rtol=1e-05, atol=1e-05)
-        if matrices_match:
-            print("\t✅ VERIFICATION SUCCESSFUL: The matrices are almost identical!")
-            # Show peak difference
-            max_diff = np.max(np.abs(C_test - C_numpy))
-            print(f"\t\tMax absolute numerical deviation: {max_diff:.2e}")
-        else:
-            print("\t❌ VERIFICATION FAILED: The output matrices do not match.")
-            # Diagnostics
-            mismatches = np.where(~np.isclose(C_test, C_numpy, rtol=1e-05, atol=1e-05))
-            print(f"\t\tNumber of elements out of tolerance: {len(mismatches[0])}")
-        print("-"*80)
+    readme_print(results, ref_results)
