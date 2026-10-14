@@ -125,6 +125,9 @@ PYBIND11_MODULE(hpc_benchmark_core, m) {
     m.def("armadillo_dot", &eigen_dot, "ARMADILLO CPU Matrix Multiplication",
         py::arg("A"), py::arg("B")
     );
+    m.def("armadillo_dot_gpu", &armadillo_dot_gpu, "ARMADILLO GPU Matrix Multiplication",
+        py::arg("A"), py::arg("B")
+    );
 
     m.def("kiwaku_dot", &kiwaku_dot, "Kiwaku Layout Managed CPU Matrix Multiplication",
         py::arg("A"), py::arg("B")

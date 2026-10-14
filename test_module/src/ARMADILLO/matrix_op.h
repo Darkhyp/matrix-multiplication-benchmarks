@@ -12,3 +12,8 @@ std::pair<double, py::array_t<float>> armadillo_dot(
     py::array_t<float> A,
     py::array_t<float> B
 );
+
+std::pair<double, py::array_t<float>> armadillo_dot_gpu(
+    py::array_t<float> A,
+    py::array_t<float> B
+);

@@ -208,6 +208,7 @@ if sys.platform == "win32":
         "kokkoscore",
         "cudart_static",
         "cuda",
+        "cublas",
         "lapack",
         "openblas",
     ]
@@ -394,6 +395,7 @@ else:
         "cudart",
         "cuda",
         "openblas",
+        "cublas",
         "gfortran",
         "quadmath",
         "dl",

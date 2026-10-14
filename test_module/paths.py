@@ -97,6 +97,7 @@ CPP_SOURCES = path2str([
     SRC / "EVE" / "matrix_dot2.cpp",
     SRC / "EIGEN" / "matrix_dot.cpp",
     SRC / "ARMADILLO" / "matrix_dot.cpp",
+    SRC / "ARMADILLO" / "matrix_dot2.cpp",
     SRC / "CUDA" / "matrix_op.cpp",
 ])
 

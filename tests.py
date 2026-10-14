@@ -85,9 +85,12 @@ def kokkos_test(A, B):
 def eigen_test(A, B):
     return TEST.eigen_dot(A, B)
 
-@benchmark("ARMADILLO C++ Engine", n=N_repetitions, warmup=WARMUP)
+@benchmark("ARMADILLO CPU C++ Engine", n=N_repetitions, warmup=WARMUP)
 def armadillo_test(A, B):
     return TEST.armadillo_dot(A, B)
+@benchmark("ARMADILLO GPU C++ Engine", n=N_repetitions, warmup=WARMUP)
+def armadillo_test2(A, B):
+    return TEST.armadillo_dot_gpu(A, B)
 
 @benchmark("EVE C++ Engine", n=N_repetitions, warmup=WARMUP)
 def eve_test(A, B):
@@ -163,8 +166,10 @@ if __name__ == '__main__':
     results.append(eigen_test(A, B))
 
     # Call the C++ extension with ARMADILLO
-    print("Running ARMADILLO Matrix Multiplication...")
+    print("Running ARMADILLO CPU Matrix Multiplication...")
     results.append(armadillo_test(A, B))
+    print("Running ARMADILLO GPU Matrix Multiplication...")
+    results.append(armadillo_test2(A, B))
 
     # Call the python with NUMBA
     print("Running numba Matrix Multiplication...")
