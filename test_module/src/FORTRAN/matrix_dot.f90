@@ -13,17 +13,27 @@ subroutine matmul_cpu(A, B, C, N, M, P, elapsed_ms)
     real(c_float), intent(out) :: C(N, P)
     real(c_double), intent(out):: elapsed_ms
 
-    integer :: i, j, k
+!    integer :: i, j, k
+    integer :: i, j, l, jj, ll
+    integer, parameter  :: BJ = 64, BL = 256
+
     integer(c_long_long) :: start_count, end_count, rate
 
     ! Start CPU Timer
     call system_clock(start_count, rate)
 
-    ! Modern Standard Parallel Loop (or use OpenMP: !$omp parallel do collapse(2))
-    do concurrent (j = 1:P, i = 1:N)
-        C(i, j) = 0.0_c_float  ! FIX: Changed '0.0pt' to correct Fortran kind literal syntax
-        do k = 1, M
-            C(i, j) = C(i, j) + A(i, k) * B(k, j)
+    c = 0.0_c_float
+    !$omp parallel do private(ll, j, l, i) schedule(static)
+    do jj = 1, p, BJ
+        do ll = 1, m, BL
+          do j = jj, min(jj+BJ-1, p)
+            do l = ll, min(ll+BL-1, m)
+              !$omp simd
+              do i = 1, n
+                c(i,j) = c(i,j) + a(i,l) * b(l,j)
+              end do
+            end do
+          end do
         end do
     end do
 

@@ -56,6 +56,7 @@ pause
 @REM :: usefull commands:
 @REM :: 1. Shut down the current container
 @REM docker compose down
+@REM docker rm -f hpc_test_runner
 @REM
 @REM Update docker image
 @REM :: 2. Force a completely clean build ignoring cached layers
@@ -63,7 +64,7 @@ pause
 @REM docker compose build
 @REM
 @REM :: 3. Boot it back up
-@REM docker compose up -d
+@REM docker compose up -d hpc_stack
 @REM
 @REM :: open docker container terminal
 @REM docker compose exec hpc_stack bash
@@ -73,7 +74,5 @@ pause
 @REM > nvfortran --version
 @REM > echo "$CUDA_VISIBLE_DEVICES"
 
-
-@REM docker compose up -d hpc_stack
 @REM docker compose ps -a
-@REM docker compose exec hpc_stack bash -lc "cd /workspace/test_module_linux && python3 -c 'import hpc_benchmark_core; print(hpc_benchmark_core.__file__)'"
+@REM docker compose exec hpc_stack bash -lc "cd /workspace/linux && python3 -c 'import hpc_benchmark_core; print(hpc_benchmark_core.__file__)'"

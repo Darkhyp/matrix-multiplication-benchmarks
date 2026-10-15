@@ -111,6 +111,9 @@ if platform.system() == "Linux":
     @benchmark("Fortran CPU Engine", n=N_repetitions, warmup=WARMUP)
     def fortran_cpu_test(A, B):
         return TEST.matmul_cpu(A, B)
+    @benchmark("Fortran CPU sgemm Engine", n=N_repetitions, warmup=WARMUP)
+    def fortran_cpu_test2(A, B):
+        return TEST.matmul_cpu_sgemm(A, B)
 
     @benchmark("Fortran GPU Engine", n=N_repetitions, warmup=WARMUP)
     def fortran_gpu_test(A, B):
@@ -216,6 +219,8 @@ if __name__ == '__main__':
     if platform.system() == "Linux":
         print("Running Fortran CPU Matrix Multiplication...")
         results.append(fortran_cpu_test(A_f, B_f))
+        print("Running Fortran CPU sgemm Matrix Multiplication...")
+        results.append(fortran_cpu_test2(A_f, B_f))
 
         print("Running Fortran GPU Matrix Multiplication...")
         results.append(fortran_gpu_test(A_f, B_f))

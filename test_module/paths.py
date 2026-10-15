@@ -11,8 +11,16 @@ from pathlib import Path
 def path2str(paths: list[Path]):
     return [str(Path(p).resolve()) for p in paths]
 
+IS_WINDOWS = sys.platform == "win32"
+OBJ_SUFFIX = ".obj" if IS_WINDOWS else ".o"
+
+CUDA_ARCH = os.environ.get("CUDA_ARCH", "89")
+CUDA_VERSION = os.environ.get("CUDA_VERSION", "12.4")
+FORCE_REBUILD = os.environ.get("FORCE_REBUILD") == "1"
+
+
 # Définition des racines selon l'OS
-if sys.platform == "win32":
+if IS_WINDOWS:
     MODULE_ROOT = Path(__file__).resolve().parent
 else:
     import pybind11
@@ -22,7 +30,7 @@ else:
 SRC = MODULE_ROOT / "src"
 
 # Configuration spécifique par OS
-if sys.platform == "win32":
+if IS_WINDOWS:
     MSVC_BIN = r"C:\Program Files\Microsoft Visual Studio\18\Professional\VC\Tools\MSVC\14.50.35717\bin\HostX86\x64"
     MSYS_LIB = Path(r"C:\msys64\ucrt64\lib")
 
@@ -79,6 +87,7 @@ CUDA_INCLUDE = CUDA_PATH / "include"
 
 FORTRAN_CPU = [
     SRC / "FORTRAN" / "matrix_dot.f90",
+    SRC / "FORTRAN" / "matrix_dot_sgemm.f90",
 ]
 
 FORTRAN_GPU = [
@@ -123,12 +132,6 @@ INCLUDE_DIRS = path2str([
     RABERU_INCLUDE,
     KUMI_INCLUDE,
 ])
-if sys.platform == "Linux":
-    INCLUDE_DIRS += [
-        pybind11.get_include(),
-        pybind11.get_include(user=True),
-        sysconfig.get_path("include"),
-    ]
 
 # ------------------------------------------------------------
 # Lib directories

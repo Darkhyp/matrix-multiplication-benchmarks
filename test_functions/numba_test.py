@@ -15,7 +15,7 @@ def numba_matrix_dot(A, B):
     C = np.zeros((rows_A, cols_B), dtype=np.float32)
 
     # Standard, clean IKJ loop order
-    for i in range(rows_A):
+    for i in prange(rows_A):
         for k in range(cols_A):
             a_ik = A[i, k]  # Clean 2D scalar access
 

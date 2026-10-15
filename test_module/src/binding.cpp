@@ -49,6 +49,15 @@ extern "C" {
         int* P,
         double* elapsed_ms
     );
+    void matmul_cpu_sgemm_(
+        float* A,
+        float* B,
+        float* C,
+        int* N,
+        int* M,
+        int* P,
+        double* elapsed_ms
+    );
     void matmul_gpu_(
         float* A,
         float* B,
@@ -140,6 +149,9 @@ PYBIND11_MODULE(hpc_benchmark_core, m) {
 
 #ifdef HAS_FORTRAN
     m.def("matmul_cpu", &matmul_wrapper<matmul_cpu_>, "Fortran CPU matrix multiplication",
+        py::arg("A"), py::arg("B")
+    );
+    m.def("matmul_cpu_sgemm", &matmul_wrapper<matmul_cpu_sgemm_>, "Fortran CPU matrix multiplication",
         py::arg("A"), py::arg("B")
     );
 
