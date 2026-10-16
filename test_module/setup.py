@@ -98,7 +98,7 @@ def compile_fortran_cpu(sources, out_dir: Path):
             if not PATHS.IS_WINDOWS:
                 flags.append("-std=legacy")
         elif not PATHS.IS_WINDOWS:
-            flags.append()
+            flags.append("-std=f2018")
 
         run([compiler, "-c", src, "-o", obj, *flags])
 
