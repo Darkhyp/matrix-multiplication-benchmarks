@@ -9,9 +9,9 @@ void launch_matmul_kernel(
     const float* dA,
     const float* dB,
     float* dC,
-    int rows_A,
-    int cols_A,
-    int cols_B,
+    const int rows_A,
+    const int cols_A,
+    const int cols_B,
     int blockx,
     int blocky
     );
@@ -20,9 +20,9 @@ void launch_matmul_kernel_optimized(
     const float* dA,
     const float* dB,
     float* dC,
-    int rows_A,
-    int cols_A,
-    int cols_B,
+    const int rows_A,
+    const int cols_A,
+    const int cols_B,
     int blockx,
     int blocky
     );

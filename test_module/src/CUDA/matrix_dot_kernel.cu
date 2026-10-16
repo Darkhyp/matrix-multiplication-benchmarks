@@ -8,9 +8,9 @@ void matmulKernel(
     const float* A,
     const float* B,
     float* C,
-    int M,
-    int K,
-    int N
+    const int M,
+    const int K,
+    const int N
 )
 {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -28,9 +28,6 @@ void matmulKernel(
             Bcol += N;
         }
 
-//         for(int i = 0; i < K; i++)
-//             sum += A[row * K + i] * B[i * N + col];
-
         C[row * N + col] = sum;
     }
 }
@@ -39,9 +36,9 @@ void launch_matmul_kernel(
     const float* dA,
     const float* dB,
     float* dC,
-    int rows_A,
-    int cols_A,
-    int cols_B,
+    const int rows_A,
+    const int cols_A,
+    const int cols_B,
     int blockx,
     int blocky
 )
@@ -51,7 +48,4 @@ void launch_matmul_kernel(
 
     // ONLY execute the triple brackets inside a .cu file compiled by NVCC!
     matmulKernel<<<grid, block>>>(dA, dB, dC, rows_A, cols_A, cols_B);
-
-    // Check for launch errors
-    cudaDeviceSynchronize();
 }

@@ -13,94 +13,9 @@
 #include "KOKKOS/matrix_op.h"
 #include "KIWAKU/matrix_op.h"
 #include "CUBLAS/matrix_op.h"
+#include "FORTRAN/fortran.h"
 
 namespace py = pybind11;
-
-#ifdef _WIN32
-#include <windows.h>
-extern "C" void _gfortran_system_clock_8(long long* count, long long* rate, long long* max) {
-    LARGE_INTEGER c, f;
-    QueryPerformanceCounter(&c);
-    QueryPerformanceFrequency(&f);
-    if (count) *count = c.QuadPart;
-    if (rate)  *rate  = f.QuadPart;
-    if (max)   *max   = 0x7fffffffffffffffLL;
-}
-#endif
-
-#ifdef HAS_FORTRAN
-using matmul_func = void (*)(
-    float*,
-    float*,
-    float*,
-    int*,
-    int*,
-    int*,
-    double*
-);
-
-extern "C" {
-    void matmul_cpu_(
-        float* A,
-        float* B,
-        float* C,
-        int* N,
-        int* M,
-        int* P,
-        double* elapsed_ms
-    );
-    void matmul_cpu_sgemm_(
-        float* A,
-        float* B,
-        float* C,
-        int* N,
-        int* M,
-        int* P,
-        double* elapsed_ms
-    );
-    void matmul_gpu_(
-        float* A,
-        float* B,
-        float* C,
-        int* N,
-        int* M,
-        int* P,
-        double* elapsed_ms
-    );
-}
-
-template<matmul_func T>
-std::pair<double, py::array_t<float>> matmul_wrapper(
-    py::array_t<float> A,
-    py::array_t<float> B
-)
-{
-    auto bufA = A.request();
-    auto bufB = B.request();
-
-    int N = bufA.shape[0];
-    int M = bufA.shape[1];
-    int P = bufB.shape[1];
-
-    py::array_t<float, py::array::f_style> C({N, P});
-
-    auto bufC = C.request();
-
-    double elapsed_ms = 0.0;
-
-    T(
-        static_cast<float*>(bufA.ptr),
-        static_cast<float*>(bufB.ptr),
-        static_cast<float*>(bufC.ptr),
-        &N,
-        &M,
-        &P,
-        &elapsed_ms
-    );
-
-    return {elapsed_ms, C};
-}
-#endif
 
 
 PYBIND11_MODULE(hpc_benchmark_core, m) {
@@ -147,7 +62,6 @@ PYBIND11_MODULE(hpc_benchmark_core, m) {
         py::arg("A"), py::arg("B")
     );
 
-#ifdef HAS_FORTRAN
     m.def("matmul_cpu", &matmul_wrapper<matmul_cpu_>, "Fortran CPU matrix multiplication",
         py::arg("A"), py::arg("B")
     );
@@ -155,6 +69,7 @@ PYBIND11_MODULE(hpc_benchmark_core, m) {
         py::arg("A"), py::arg("B")
     );
 
+#ifdef HAS_GPU_FORTRAN
     m.def("matmul_gpu", &matmul_wrapper<matmul_gpu_>, "Fortran GPU matrix multiplication",
         py::arg("A"), py::arg("B")
     );

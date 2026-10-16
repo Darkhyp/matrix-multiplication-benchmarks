@@ -98,7 +98,7 @@ def compile_fortran_cpu(sources, out_dir: Path):
             if not PATHS.IS_WINDOWS:
                 flags.append("-std=legacy")
         elif not PATHS.IS_WINDOWS:
-            flags.append("-std=f2018")
+            flags.append()
 
         run([compiler, "-c", src, "-o", obj, *flags])
 
@@ -213,15 +213,15 @@ EXTRA_LINK_ARGS = []
 if PATHS.IS_WINDOWS:
     EXTRA_COMPILE_ARGS = [
         "/O2", "/EHsc", "/bigobj", "/arch:AVX2", "/MT",
-        "/DHAS_FORTRAN",  # binding.cpp
         "/DEIGEN_USE_BLAS",
         "/DARMA_DONT_USE_WRAPPER", "/DARMA_DONT_USE_LAPACK", "/DARMA_USE_BLAS",
     ]
 else:
     EXTRA_COMPILE_ARGS = [
         "-O3", "-fPIC", "-mavx2", "-fopenmp",
-        "-DHAS_FORTRAN",  # binding.cpp
         "-DEIGEN_USE_BLAS",
+        "-DARMA_USE_BLAS",
+        "-DHAS_GPU_FORTRAN",  # FORTRAN/fortran.h
     ]
     EXTRA_LINK_ARGS += ["-Wl,--no-as-needed", "-lgomp"]
     LIBRARIES += [

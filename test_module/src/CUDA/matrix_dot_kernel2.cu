@@ -10,9 +10,9 @@ void matmulKernelOptimized(
     const float* A,
     const float* B,
     float* C,
-    int M,
-    int K,
-    int N
+    const int M,
+    const int K,
+    const int N
 )
 {
     // Déclaration de la mémoire partagée pour les tuiles de A et B
@@ -69,9 +69,9 @@ void launch_matmul_kernel_optimized(
     const float* dA,
     const float* dB,
     float* dC,
-    int rows_A,
-    int cols_A,
-    int cols_B,
+    const int rows_A,
+    const int cols_A,
+    const int cols_B,
     int blockx,
     int blocky
 )
@@ -81,7 +81,4 @@ void launch_matmul_kernel_optimized(
 
     // ONLY execute the triple brackets inside a .cu file compiled by NVCC!
     matmulKernelOptimized<<<grid, block>>>(dA, dB, dC, rows_A, cols_A, cols_B);
-
-    // Check for launch errors
-    cudaDeviceSynchronize();
 }

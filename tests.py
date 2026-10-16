@@ -107,14 +107,14 @@ def kiwaku_test(A, B):
 def kiwaku_test2(A, B):
     return TEST.kiwaku_dot2(A, B)
 
-if platform.system() == "Linux":
-    @benchmark("Fortran CPU Engine", n=N_repetitions, warmup=WARMUP)
-    def fortran_cpu_test(A, B):
-        return TEST.matmul_cpu(A, B)
-    @benchmark("Fortran CPU sgemm Engine", n=N_repetitions, warmup=WARMUP)
-    def fortran_cpu_test2(A, B):
-        return TEST.matmul_cpu_sgemm(A, B)
 
+@benchmark("Fortran CPU Engine", n=N_repetitions, warmup=WARMUP)
+def fortran_cpu_test(A, B):
+    return TEST.matmul_cpu(A, B)
+@benchmark("Fortran CPU sgemm Engine", n=N_repetitions, warmup=WARMUP)
+def fortran_cpu_test2(A, B):
+    return TEST.matmul_cpu_sgemm(A, B)
+if platform.system() == "Linux":
     @benchmark("Fortran GPU Engine", n=N_repetitions, warmup=WARMUP)
     def fortran_gpu_test(A, B):
         return TEST.matmul_gpu(A, B)
@@ -130,6 +130,7 @@ def readme_print(results, ref_results):
     for result in results:
         t = result["mean"]
         tm = result["median"]
+        if not t or not tm: continue
         dt = result["stdev"]
         print(f'| {"**" + result["comment"]+"**":30s} | {t:10.4f} ±{dt:7.4f} | {tm:11.4f} |{numpy_execution_time/t:8.2f}({numpy_median_time/tm:7.2f})x | ', end="")
         C_test = result["result"]
@@ -216,12 +217,11 @@ if __name__ == '__main__':
     results.append(kiwaku_test2(A, B))
 
     # Call the fortran functions
+    print("Running Fortran CPU Matrix Multiplication...")
+    results.append(fortran_cpu_test(A_f, B_f))
+    print("Running Fortran CPU sgemm Matrix Multiplication...")
+    results.append(fortran_cpu_test2(A_f, B_f))
     if platform.system() == "Linux":
-        print("Running Fortran CPU Matrix Multiplication...")
-        results.append(fortran_cpu_test(A_f, B_f))
-        print("Running Fortran CPU sgemm Matrix Multiplication...")
-        results.append(fortran_cpu_test2(A_f, B_f))
-
         print("Running Fortran GPU Matrix Multiplication...")
         results.append(fortran_gpu_test(A_f, B_f))
 

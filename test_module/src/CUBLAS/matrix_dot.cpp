@@ -3,67 +3,23 @@
 // e-mail: a.v.korovin73@gmail.com
 // SPDX-License-Identifier: MIT
 
-#include <pybind11/pybind11.h>
-#include <pybind11/numpy.h>
+#include "../CUDA/cuda_wrapper.h"
 #include <cublas_v2.h>
-#include <cuda_runtime.h>
-#include <stdexcept>
 
 static cublasHandle_t g_handle = nullptr;
 
-namespace py = pybind11;
-
-std::pair<double, py::array_t<float>> cublas_dot_gpu(
-    py::array_t<float> A,
-    py::array_t<float> B
+void launch_cublas_dot_kernel(
+    const float* dA,
+    const float* dB,
+    float* dC,
+    const int& rows_A,
+    const int& cols_A,
+    const int& cols_B,
+    int blockx,
+    int blocky
 )
 {
-    const auto rows_A = A.shape(0);
-    const auto cols_A = A.shape(1);
-    const auto rows_B = B.shape(0);
-    const auto cols_B = B.shape(1);
-
-    if (A.ndim() != 2 || B.ndim() != 2)
-        throw std::runtime_error("Expected 2D arrays");
-    if (cols_A != rows_B)
-        throw std::runtime_error("A and B are not compatible");
-
-    if (A.ndim() != 2 || B.ndim() != 2)
-        throw std::runtime_error("Expected 2D arrays");
-    if (cols_A != rows_B)
-        throw std::runtime_error("A and B are not compatible");
-
-    const auto rows_C = rows_A;
-    const auto cols_C = cols_B;
-    // Création de la matrice de sortie C pour NumPy
-    py::array_t<float> C({rows_C, cols_C});
-
-    py::buffer_info bufA = A.request();
-    py::buffer_info bufB = B.request();
-    py::buffer_info bufC = C.request();
-
-    // Mappage direct des tampons NumPy vers des vues Armadillo (zéro copie)
-    // Note: Armadillo utilise par défaut le format column-major.
-    // Pour du row-major, on utilise arma::fmat avec un constructeur de vue si besoin,
-    // ou on mappe en tenant compte de la disposition mémoire.
-    const float* ptr_A = static_cast<const float*>(bufA.ptr);
-    const float* ptr_B = static_cast<const float*>(bufB.ptr);
-    float* ptr_C = static_cast<float*>(bufC.ptr);
-
-    if (!g_handle) cublasCreate(&g_handle);
-
-    float *dA, *dB, *dC;
-    cudaMalloc(&dA, sizeof(float) * rows_A * cols_A);
-    cudaMalloc(&dB, sizeof(float) * rows_B * cols_B);
-    cudaMalloc(&dC, sizeof(float) * rows_A * cols_B);
-    cudaMemcpy(dA, const_cast<float*>(ptr_A), sizeof(float) * rows_A * cols_A, cudaMemcpyHostToDevice);
-    cudaMemcpy(dB, const_cast<float*>(ptr_B), sizeof(float) * rows_B * cols_B, cudaMemcpyHostToDevice);
-
     const float alpha = 1.f, beta = 0.f;
-    cudaEvent_t t0, t1;
-    cudaEventCreate(&t0); cudaEventCreate(&t1);
-
-    cudaEventRecord(t0);
 
     // TRICK ROW-MAJOR POUR CUBLAS :
     // On calcule B * A en inversant les dimensions pour s'adapter au Column-Major de cuBLAS
@@ -77,18 +33,17 @@ std::pair<double, py::array_t<float>> cublas_dot_gpu(
         &beta,
         dC, cols_B               // Matrice C résultat,  ldc = cols_B
     );
+}
 
-    cudaEventRecord(t1);
-    cudaEventSynchronize(t1);
-
-    float duration_ms = 0.f;
-    cudaEventElapsedTime(&duration_ms, t0, t1);
-
-    cudaMemcpy(ptr_C, dC, sizeof(float) * rows_A * cols_B, cudaMemcpyDeviceToHost);
-    cudaFree(dA); cudaFree(dB); cudaFree(dC);
-    cudaEventDestroy(t0); cudaEventDestroy(t1);
-
+// Utilise le noyau standard
+std::pair<double, py::array_t<float>> cublas_dot_gpu(
+    py::array_t<float> A,
+    py::array_t<float> B
+)
+{
+    if (!g_handle) cublasCreate(&g_handle);
+    return cuda_dot_T<launch_cublas_dot_kernel>(A, B, 16, 16);
+//    auto ret cuda_dot_T<launch_cublas_dot_kernel>(A, B, blockx, blocky);
 //    if (g_handle) { cublasDestroy(g_handle); g_handle = nullptr; }
-
-    return {duration_ms, C};
+//    return ret;
 }

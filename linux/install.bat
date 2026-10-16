@@ -23,7 +23,7 @@ echo Docker is running.
 call "%~dp0..\print_box.bat" "Ensuring Container is up and Volumes are Remounted..."
 :: '--build' checks if your Dockerfile changed. If it didn't, it skips
 :: straight to starting the container using your live local folder changes.
-@REM docker compose up -d --build
+docker compose up -d --build
 
 call "%~dp0..\print_box.bat" "Running Benchmark Suite Inside Pure Linux Environment..."
 :: This non-interactive command sends the script directly into the container,
